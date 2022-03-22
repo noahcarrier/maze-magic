@@ -51,7 +51,8 @@ public class Main
 
 
             int source  = findSastry();
-            int minDist = findTargetBST(source, 0);
+            System.out.println("K position = " + source);
+            //int minDist = findTargetBST(source, 0);
             
             input.close();
         }
@@ -118,7 +119,18 @@ public class Main
 
     //==============     FIND SOURCE METHOD       =============
     private static int findSastry() {
-        return 0;
+
+        for (int i = 0; i < r; i++)
+        {
+            for (int j = 0; j < c; j++)
+            {
+                if (maze[i][j] == '*')
+                    return i * r + c;
+            }
+        }
+        System.out.println("\n\nError (1): No source position discovered!\n");
+        System.exit(-1);
+        return -1;
     }
     //=========================================================
 
