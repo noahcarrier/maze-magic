@@ -49,7 +49,7 @@ public class Main {
             for (int i = 0; i < r; i++)     //Reading in maze data
                 maze[i] = input.next().toCharArray();
 
-            testPrint(maze, r,c);       // Test print to verify validity of matrix
+            //testPrint(maze, r,c);       // Test print to verify validity of matrix
 
             
             Coordinate source  = method.findSastry(); // Finding position of Sastry in the maze
@@ -58,15 +58,14 @@ public class Main {
             { System.out.println("\n\nError (1): No source position discovered!\n"); System.exit(1); }
 
 
-            System.out.println("K position = " + source.pos);       //Reciting position of Sastry
+            //System.out.println("K position = " + source.pos);       //Reciting position of Sastry
             
             
             int minDist = findTargetBST(source, '$');
             
-            if (minDist == -1)           // If position cannot be found, exit program
-            { System.out.println("\n\nError (2): No target position discovered!\n"); System.exit(2); }
+            
 
-            System.out.println("Minimum distance = " + minDist);
+            System.out.println(minDist);
             input.close();
         }
 
@@ -123,15 +122,19 @@ public class Main {
                     continue;
 				if (maze[nextY][nextX] == '#')
                     continue;
+                if (maze[nextY][nextX] >= 95 && maze[nextY][nextX] <= 90)
+                    teleport();
 				if (distance[nextX*r+nextY] != -1)
                     continue;
 
-                System.out.println("New Coord: ["+nextX + "," + nextY+"] Val: "+maze[nextX][nextY]);
-
-                distance[nextX * r + nextY] = currentSpot.distance + 1;
-                
                 Coordinate nextCoord;
                 nextCoord = new Coordinate(nextY, nextX, nextX * r + nextY, maze[nextY][nextX]);
+
+                //System.out.println("New Coord: ["+nextX + "," + nextY+"] Val: "+maze[nextX][nextY]);
+
+                nextCoord.distance = (currentSpot.distance + 1);
+                distance[nextX * r + nextY] = nextCoord.distance*2;
+                
                 queue.offer(nextCoord);
             }
             
@@ -147,6 +150,20 @@ public class Main {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+    private static void teleport() {
+    }
 
 
 
