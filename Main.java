@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import javax.swing.event.SwingPropertyChangeSupport;
+
 
 // Main Class
 public class Main {
@@ -59,7 +61,7 @@ public class Main {
             System.out.println("K position = " + source.pos);       //Reciting position of Sastry
             
             
-            int minDist = findTargetBST(source);
+            int minDist = findTargetBST(source, '$');
             
             if (minDist == -1)           // If position cannot be found, exit program
             { System.out.println("\n\nError (2): No target position discovered!\n"); System.exit(2); }
@@ -88,97 +90,60 @@ public class Main {
 
 
     //==============     FIND TARGET METHOD       =============
-    private static int findTargetBST(Coordinate source) {
-        
-        int distance = 0;
+    private static int findTargetBST(Coordinate source, int target) {
+
+        LinkedList <Coordinate> queue = new LinkedList<>();
+        queue.add(source);
+
+        int [] distance = new int [r*c];
+        Arrays.fill(distance, -1);
+        source.distance = 0;
+
         int [] xDirs = {1,0,-1,0};
         int [] yDirs = {0,1,0,-1};
         
-        LinkedList <Character> queue = new LinkedList<>();
-        queue.add(source.val);
         //======    Breadth First Search    ======
         while (!queue.isEmpty())
         {
-
-            for (int i = 0 ; i < queue.size(); i++)
-            {
-                Coordinate currentNode = source;
-                currentNode.setVal(queue.poll());
-
-                if (currentNode.val == '$')
-                    return distance;
-                for (int j = 0; j < yDirs.length; j++)
-                {
-                    int nextX = currentNode.x + xDirs[j];
-                    int nextY = currentNode.y + yDirs[j];
-
-
-
-                    if (xDirs[j] != 0)  nextY = 0;
-                    if (yDirs[j] != 0)  nextX = 0;
-                    
-                    
-                    
-                    // Skipping out of bounds indexes or forbidden space
-                    if ( (nextX < 0 || nextX >= c-1 || nextY < 0 || nextY >= r-1) || (maze[nextY][nextX] == '!') )
-                        continue;
-                    System.out.println("X: " + nextX + "\tY: "+nextY);
-
-                    currentNode.pos = nextY * r + nextX;    // Convert from 2D to linear index
-
-                    queue.add(maze[currentNode.y][currentNode.x]);   // Add the neighbors into the queue
-                }
+            Coordinate currentSpot = new Coordinate();
+            currentSpot = queue.poll();
             
+            //System.out.println("\nCurrent Spot\n==============\n" + "\nValue: "+ currentSpot.val+"\nX & Y: [" + currentSpot.x +","+currentSpot.y+"]" +"\nCurrent Position: "+currentSpot.pos+"\n");
+            
+            for (int i = 0; i < xDirs.length; i++)
+            {
+                int nextY = currentSpot.pos/c + yDirs[i];
+                int nextX = currentSpot.pos%c + xDirs[i];
+
+                if (currentSpot.val == '$')
+                    return distance[currentSpot.pos];
+
+
+                if (nextX < 0 || nextX >= c-1 || nextY < 0 || nextY >= r-1)
+                    continue;
+				if (maze[nextY][nextX] == '#')
+                    continue;
+				if (distance[nextX*r+nextY] != -1)
+                    continue;
+
+                System.out.println("New Coord: ["+nextX + "," + nextY+"] Val: "+maze[nextX][nextY]);
+
+                distance[nextX * r + nextY] = currentSpot.distance + 1;
+                
+                Coordinate nextCoord;
+                nextCoord = new Coordinate(nextY, nextX, nextX * r + nextY, maze[nextY][nextX]);
+                queue.offer(nextCoord);
             }
-
-            distance++;
-
+            
         }
 
-
+        
 
         return -1;
     }
     //=========================================================
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    //==============     COORDINATE METHOD       =============
-    class Coordinate {
-        int x, y, pos;
-        private char val;
-        Coordinate (int y, int x, int pos) {
-            this.x = x;
-            this.y = y;
-            this.pos = pos;
-        }
-        Coordinate () {        }
-
-        public void setPos(int pos) {
-            this.pos = pos;
-        }
-        public int getPos() {
-            return pos;
-        }
-        public char getVal() {
-            return val;
-        }
-        public void setVal(char val) {
-            this.val = val;
-        }
-    }
-    //========================================================
 
 
 
@@ -202,7 +167,7 @@ public class Main {
             {
                 if (maze[i][j] == '*')
                 {
-                    return new Coordinate(r, c, i * r + j);
+                    return new Coordinate(i, j, i * r + j);
                 }
             }
         }
@@ -228,3 +193,38 @@ public class Main {
     }
     //========================================================
 }
+
+
+
+
+//==============     COORDINATE CLASS       =============
+class Coordinate {
+    int x, y, pos, distance;
+    char val;
+    Coordinate (int y, int x, int pos, char val) {
+        this.x = x;
+        this.y = y;
+        this.pos = pos;
+        this.val = val;
+    }
+    Coordinate () {
+    }
+    Coordinate (int y, int x, int pos) {
+        this.x = x;
+        this.y = y;
+        this.pos = pos;
+    }
+    public void setPos(int pos) {
+        this.pos = pos;
+    }
+    public int getPos() {
+        return pos;
+    }
+    public char getVal() {
+        return val;
+    }
+    public void setVal(char val) {
+        this.val = val;
+    }
+}
+//========================================================
